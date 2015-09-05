@@ -16,3 +16,6 @@ def with_named_parameters(foo: Foo):
 
 def with_recursive_parameters(bar: Bar):
 	return bar
+
+def with_positional_parameters(first, second):
+	return (first, second)

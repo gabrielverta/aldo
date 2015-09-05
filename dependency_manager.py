@@ -5,11 +5,12 @@ class Aldo:
 		Aldo dependency manager
 	"""
 
-	def __init__(self, func):
+	def __init__(self, func, **kwargs):
 		"""
 			Function to handle dependencies
 		"""
 		self.func = func
+		self.kwargs = kwargs
 
 	def parameters(self):
 		"""
@@ -32,7 +33,7 @@ class Aldo:
 			Call handled function using parameters
 		"""
 		args = []
-		kwargs = {}
+		kwargs = dict(**self.kwargs)
 
 		parameters = self.parameters()
 		for key in parameters:
@@ -44,4 +45,4 @@ class Aldo:
 		"""
 			Handle new instances of klass and dependencies
 		"""
-		return Aldo(klass)()
+		return Aldo(klass, **self.kwargs)()
