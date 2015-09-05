@@ -18,7 +18,14 @@ class Bar:
 		self.foo = foo
 
 class Baz:
-	pass
+	@aldo
+	def save(self, foo: Foo):
+		return foo
+
+	@aldo
+	def extra(self, bar, foo: Foo):
+		return foo, bar
+
 
 @aldo
 def with_parameters(foo: Foo):
@@ -29,23 +36,36 @@ def with_parameters(foo: Foo):
 def with_parameters_forever(bar: Bar, baz: Baz):
 	return (bar, baz)
 
-def test_without_parameters():
-	func = without_parameters
-	assert("""
-		Function without parameters with comments
-	""" == func.__doc__)
-	assert("without_parameters" == func.__name__)
-	assert(True == func())
+# def test_without_parameters():
+# 	func = without_parameters
+# 	assert("""
+# 		Function without parameters with comments
+# 	""" == func.__doc__)
+# 	assert("without_parameters" == func.__name__)
+# 	assert(True == func())
 
 
-def test_with_parameters():
-	response = with_parameters()
-	assert(isinstance(response, Foo))
+# def test_with_parameters():
+# 	response = with_parameters()
+# 	assert(isinstance(response, Foo))
 
 
-def test_with_parameters_forever():
-	bar, baz = with_parameters_forever()
-	assert(isinstance(bar, Bar))
-	assert(isinstance(bar.foo, Foo))
-	assert(isinstance(baz, Baz))
+# def test_with_parameters_forever():
+# 	bar, baz = with_parameters_forever()
+# 	assert(isinstance(bar, Bar))
+# 	assert(isinstance(bar.foo, Foo))
+# 	assert(isinstance(baz, Baz))
 
+
+def test_with_class_method():
+	baz = Baz()
+	foo = baz.save()
+	assert(isinstance(foo, Foo))
+
+	# foo, bar = baz.extra('bla')
+	# assert(isinstance(foo, Foo))
+	# assert('bla' == bar)
+
+	# foo, bar = baz.extra(bar='bla')
+	# assert(isinstance(foo, Foo))
+	# assert('bla' == bar)

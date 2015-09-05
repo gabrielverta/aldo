@@ -1,45 +1,47 @@
 # -*- cod: utf-8 -*-
 
+import inspect
+
+
 class Aldo:
 	"""
 		Aldo dependency manager
 	"""
 
-	def __init__(self, func, **kwargs):
+	def __init__(self, func, *args, **kwargs):
 		"""
 			Function to handle dependencies
 		"""
 		self.func = func
+		self.args = args
 		self.kwargs = kwargs
 
 	def parameters(self):
 		"""
 			Returns list of parameters required for func
 		"""
-		try:
-			return self.func.__annotations__
-		except AttributeError:
-			pass
-
-		try:
-			return self.func.__init__.__annotations__
-		except AttributeError:
-			pass
-
-		return {}
+		return inspect.getfullargspec(self.func)
 
 	def __call__(self):
 		"""
 			Call handled function using parameters
 		"""
-		args = []
-		kwargs = dict(**self.kwargs)
+		kwargs = {}
 
 		parameters = self.parameters()
-		for key in parameters:
-			kwargs[key] = self.handle(parameters[key])
+		for key in parameters.annotations:
+			kwargs[key] = self.handle(parameters.annotations[key])
 
-		return self.func(*args, **kwargs)
+		pending = [arg for arg in parameters.args if not arg in kwargs]
+		for arg in pending:
+			if arg in self.kwargs:
+				kwargs[arg] = self.kwargs[arg]
+
+		if 'self' in pending and self.args:
+			kwargs['self'] = self.args[0]
+
+		return self.func(**kwargs)
+
 
 	def handle(self, klass):
 		"""
