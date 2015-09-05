@@ -40,7 +40,4 @@ class Aldo:
 		"""
 			Handle new instances of klass and dependencies
 		"""
-		if not '__annotations__' in dir(klass.__init__):
-			return klass()
-
 		return Aldo(klass)()
