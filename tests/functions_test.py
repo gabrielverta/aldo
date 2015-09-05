@@ -25,3 +25,20 @@ def test_function_with_recursive_parameters():
 	response = aldo()
 	assert(isinstance(response, Bar))
 	assert(isinstance(response.foo, Foo))
+
+
+def test_class_without_parameters():
+	aldo = Aldo(Foo)
+	parameters = aldo.parameters()
+	assert(0 == len(parameters))
+	response = aldo()
+	assert(isinstance(response, Foo))
+
+
+def test_class_without_parameters():
+	aldo = Aldo(Bar)
+	parameters = aldo.parameters()
+	assert(1 == len(parameters))
+	response = aldo()
+	assert(isinstance(response, Bar))
+	assert(isinstance(response.foo, Foo))
