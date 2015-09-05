@@ -1,4 +1,4 @@
-# -*- code: utf-8 -*-
+# -*- coding: utf-8 -*-
 
 from dependency_manager import Aldo
 from functools import wraps
