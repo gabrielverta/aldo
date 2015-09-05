@@ -15,13 +15,17 @@ class Aldo:
 		"""
 			Returns list of parameters required for func
 		"""
-		if not '__annotations__' in dir(self.func):
-			if '__annotations__' in dir(self.func.__init__):
-				return self.func.__init__.__annotations__
+		try:
+			return self.func.__annotations__
+		except AttributeError:
+			pass
 
-			return {}
+		try:
+			return self.func.__init__.__annotations__
+		except AttributeError:
+			pass
 
-		return self.func.__annotations__
+		return {}
 
 	def __call__(self):
 		"""
