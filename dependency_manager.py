@@ -27,6 +27,7 @@ class Aldo:
 			Call handled function using parameters
 		"""
 		kwargs = {}
+		args = []
 
 		parameters = self.parameters()
 		for key in parameters.annotations:
@@ -37,14 +38,13 @@ class Aldo:
 			if arg in self.kwargs:
 				kwargs[arg] = self.kwargs[arg]
 
-		if 'self' in pending and self.args:
-			kwargs['self'] = self.args[0]
+		args = self.args[:len(pending)]
 
-		return self.func(**kwargs)
+		return self.func(*args, **kwargs)
 
 
 	def handle(self, klass):
 		"""
 			Handle new instances of klass and dependencies
 		"""
-		return Aldo(klass, **self.kwargs)()
+		return Aldo(klass, *self.args, **self.kwargs)()

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from dependency_manager import Aldo
+from aldo.dependency_manager import Aldo
 from functools import wraps
 
 def aldo(func):

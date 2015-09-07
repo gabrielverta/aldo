@@ -1,8 +1,12 @@
 # -*- coding: utf-8 -*-
 
+import os, sys
+
+sys.path.insert(0, os.path.realpath('..'))
+
 import pytest
-from dependency_manager import Aldo
-from tests.functions import without_parameters, with_named_parameters, with_recursive_parameters, with_positional_parameters, Foo, Bar
+from aldo.dependency_manager import Aldo
+from aldo.tests.functions import without_parameters, with_named_parameters, with_recursive_parameters, with_positional_parameters, Foo, Bar
 
 def test_function_without_parameters():
 	aldo = Aldo(without_parameters)

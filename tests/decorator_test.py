@@ -1,6 +1,10 @@
 # -*- coding: utf-8 -*-
 
-from decorator import aldo
+import os, sys
+
+sys.path.insert(0, os.path.realpath('..'))
+
+from aldo.decorator import aldo
 
 
 @aldo
