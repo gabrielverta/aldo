@@ -33,9 +33,13 @@ class Aldo:
 		"""
 			Call handled function using parameters
 		"""
-		for bind in self.bindings:
-			if issubclass(self.func, bind):
-				return self.bindings[bind](*self.args, **self.kwargs)
+		if inspect.isclass(self.func):
+			for bind in self.bindings:
+				if issubclass(self.func, bind):
+					args = list(self.args)
+					kwargs = dict(**self.kwargs)
+					kwargs['klass'] = self.func
+					return self.bindings[bind](*args, **kwargs)
 
 		kwargs = {}
 		args = []
@@ -58,4 +62,6 @@ class Aldo:
 		"""
 			Handle new instances of klass and dependencies
 		"""
-		return Aldo(klass, *self.args, **self.kwargs)()
+		aldo = Aldo(klass, *self.args, **self.kwargs)
+		aldo.bindings = self.bindings
+		return aldo()
