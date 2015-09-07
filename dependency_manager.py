@@ -15,6 +15,13 @@ class Aldo:
 		self.func = func
 		self.args = args
 		self.kwargs = kwargs
+		self.bindings = {}
+
+	def bind(self, klass, factory):
+		"""
+			Add a factory for new instances of klass
+		"""
+		self.bindings[klass] = factory
 
 	def parameters(self):
 		"""
@@ -26,6 +33,10 @@ class Aldo:
 		"""
 			Call handled function using parameters
 		"""
+		for bind in self.bindings:
+			if issubclass(self.func, bind):
+				return self.bindings[bind](*self.args, **self.kwargs)
+
 		kwargs = {}
 		args = []
 
