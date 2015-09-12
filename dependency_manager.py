@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+from aldo.exceptions import AldoClassNotBindedException
 import inspect
 
 
@@ -23,15 +24,28 @@ class Aldo:
 		"""
 		self.bindings[klass] = factory
 
+	def __call__(self):
+		"""
+			Call handled function using parameters
+		"""
+		try:
+			return self._binded()
+		except AldoClassNotBindedException:
+			pass
+
+		args, kwargs = self._parse_args_and_kwargs()
+
+		return self.func(*args, **kwargs)
+
 	def parameters(self):
 		"""
 			Returns list of parameters required for func
 		"""
 		return inspect.getfullargspec(self.func)
 
-	def __call__(self):
+	def _binded(self):
 		"""
-			Call handled function using parameters
+			Returns binded class if it exists
 		"""
 		if inspect.isclass(self.func):
 			for bind in self.bindings:
@@ -41,14 +55,19 @@ class Aldo:
 					kwargs['klass'] = self.func
 					return self.bindings[bind](*args, **kwargs)
 
+		raise AldoClassNotBindedException
+
+	def _parse_args_and_kwargs(self):
+		"""
+			Inspect parameters and create instances of dependencies when it is necessary
+		"""
 		kwargs = {}
 		args = []
-
 		parameters = self.parameters()
 
-		if len(parameters.args) != len(self.args):
+		if self._args_not_filled_yet(parameters.args):
 			for key in parameters.annotations:
-				kwargs[key] = self.handle(parameters.annotations[key])
+				kwargs[key] = self._handle_class(parameters.annotations[key])
 
 			pending = [arg for arg in parameters.args if not arg in kwargs]
 			for arg in pending:
@@ -59,15 +78,20 @@ class Aldo:
 		else:
 			args = list(self.args)
 
-		return self.func(*args, **kwargs)
+		return args, kwargs
 
+	def _handle_class(self, klass):
+			"""
+				Handle new instances of klass and dependencies
+			"""
+			kwargs = dict(**self.kwargs)
+			kwargs['__origin'] = self.func
+			aldo = Aldo(klass, *self.args, **kwargs)
+			aldo.bindings = self.bindings
+			return aldo()
 
-	def handle(self, klass):
+	def _args_not_filled_yet(self, args):
 		"""
-			Handle new instances of klass and dependencies
+			Compare if current number of args fill in method or class dependencies
 		"""
-		kwargs = dict(**self.kwargs)
-		kwargs['__origin'] = self.func
-		aldo = Aldo(klass, *self.args, **kwargs)
-		aldo.bindings = self.bindings
-		return aldo()
+		return len(args) != len(self.args)
