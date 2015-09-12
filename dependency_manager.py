@@ -45,15 +45,19 @@ class Aldo:
 		args = []
 
 		parameters = self.parameters()
-		for key in parameters.annotations:
-			kwargs[key] = self.handle(parameters.annotations[key])
 
-		pending = [arg for arg in parameters.args if not arg in kwargs]
-		for arg in pending:
-			if arg in self.kwargs:
-				kwargs[arg] = self.kwargs[arg]
+		if len(parameters.args) != len(self.args):
+			for key in parameters.annotations:
+				kwargs[key] = self.handle(parameters.annotations[key])
 
-		args = self.args[:len(pending)]
+			pending = [arg for arg in parameters.args if not arg in kwargs]
+			for arg in pending:
+				if arg in self.kwargs:
+					kwargs[arg] = self.kwargs[arg]
+
+			args = self.args[:len(pending)]
+		else:
+			args = list(self.args)
 
 		return self.func(*args, **kwargs)
 
@@ -62,6 +66,8 @@ class Aldo:
 		"""
 			Handle new instances of klass and dependencies
 		"""
-		aldo = Aldo(klass, *self.args, **self.kwargs)
+		kwargs = dict(**self.kwargs)
+		kwargs['__origin'] = self.func
+		aldo = Aldo(klass, *self.args, **kwargs)
 		aldo.bindings = self.bindings
 		return aldo()
