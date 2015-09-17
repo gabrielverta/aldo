@@ -1,21 +1,21 @@
 # -*- coding: utf-8 -*-
 
 def without_parameters():
-	return True
+    return True
 
 
 class Foo:
-	pass
+    pass
 
 class Bar:
-	def __init__(self, foo: Foo):
-		self.foo = foo
+    def __init__(self, foo: Foo):
+        self.foo = foo
 
 def with_named_parameters(foo: Foo):
-	return foo
+    return foo
 
 def with_recursive_parameters(bar: Bar):
-	return bar
+    return bar
 
 def with_positional_parameters(first, second):
-	return (first, second)
+    return (first, second)

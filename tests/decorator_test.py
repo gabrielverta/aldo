@@ -2,9 +2,9 @@
 
 import os, sys
 
-sys.path.insert(0, os.path.realpath('..'))
+sys.path.insert(0, os.path.realpath('../.'))
 
-from aldo.decorator import aldo
+from aldo.decorator import aldo, teach, Aldo
 
 
 @aldo
@@ -30,6 +30,12 @@ class Baz:
 	def extra(self, bar, foo: Foo):
 		return foo, bar
 
+
+class Cache:
+    pass
+
+class RedisCache(Cache):
+    pass
 
 @aldo
 def with_parameters(foo: Foo):
@@ -80,3 +86,15 @@ def test_with_all_parameters_sent():
 	foo, bar = baz.extra('bar', 'foo')
 	assert('foo' == foo)
 	assert('bar' == bar)
+
+
+def test_teach_decorator():
+    Aldo.bindings = {}
+
+    @teach(Cache)
+    def cache_factory(*args, **kwargs):
+        return RedisCache()
+
+    manager = Aldo(Cache)
+    cache = manager()
+    assert(isinstance(cache, RedisCache))
