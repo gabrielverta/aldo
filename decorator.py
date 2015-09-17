@@ -46,3 +46,8 @@ def remove_parameters(kwargs):
         del(kwargs['__origin'])
     except KeyError:
         pass
+
+    try:
+        del(kwargs['aldo_context'])
+    except KeyError:
+        pass

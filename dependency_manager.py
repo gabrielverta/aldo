@@ -17,6 +17,7 @@ class Aldo:
         self.func = func
         self.args = args
         self.kwargs = kwargs
+        self.handled = {}
 
     @staticmethod
     def bind(klass, factory):
@@ -68,8 +69,12 @@ class Aldo:
 
         if self._args_not_filled_yet(parameters.args):
             print("not filled yet")
-            for key in parameters.annotations:
+            for key in parameters.args:
+                if not key in parameters.annotations:
+                    continue
+
                 kwargs[key] = self._handle_class(parameters.annotations[key])
+                self.handled[key] = kwargs[key]
 
             pending = [arg for arg in parameters.args if not arg in kwargs]
             for arg in pending:
@@ -88,7 +93,9 @@ class Aldo:
         """
         kwargs = dict(**self.kwargs)
         kwargs['__origin'] = self.func
+        kwargs['aldo_context'] = self.handled
         aldo = Aldo(klass, *self.args, **kwargs)
+        aldo.handled = self.handled
         return aldo()
 
     def _args_not_filled_yet(self, args):

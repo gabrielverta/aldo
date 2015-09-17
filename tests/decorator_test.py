@@ -93,8 +93,26 @@ def test_teach_decorator():
 
     @teach(Cache)
     def cache_factory(*args, **kwargs):
+        assert(not "aldo_context" in kwargs)
         return RedisCache()
 
     manager = Aldo(Cache)
     cache = manager()
     assert(isinstance(cache, RedisCache))
+
+
+def test_teaching_with_context():
+    Aldo.bindings = {}
+
+    @aldo
+    def my_view(foo: Foo, bar: Bar):
+        return foo, bar
+
+    @teach(Bar, params=True)
+    def bar_factory(aldo_context, *args, **kwargs):
+        return Bar(aldo_context['foo'])
+
+    foo, bar = my_view()
+    assert(isinstance(bar, Bar))
+    assert(isinstance(foo, Foo))
+    assert(foo == bar.foo)
