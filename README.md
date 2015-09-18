@@ -30,7 +30,7 @@ Aldo was teached for some tricks in django, so you can use a view like this:
     def show(request, poll: models.Poll):
         return HttpResponse(poll.question_text)
         
-Aldo knows that when you have a Model, he can use "MODELNAME_FIELD" kwarg (the name of field in url regular expression) to query database for an instance of it.
+Aldo knows that when you have a Model, he can use "MODELNAME_FIELD" kwarg (the name of the field used in uri regular expression) to query database for an instance of it.
 
 Aldo also knows how to use forms.Form and forms.ModelForm:
 
