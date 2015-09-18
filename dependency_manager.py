@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from aldo.exceptions import AldoClassNotBindedException
+from aldo.exceptions import AldoClassNotBindedException, AldoRedirect
 import inspect
 
 
@@ -18,6 +18,7 @@ class Aldo:
         self.args = args
         self.kwargs = kwargs
         self.handled = {}
+        self.debug = False
 
     @staticmethod
     def bind(klass, factory):
@@ -43,6 +44,9 @@ class Aldo:
         """
             Returns list of parameters required for func
         """
+        if hasattr(self.func, '_original_'):
+            return inspect.getfullargspec(self.func._original_)
+
         return inspect.getfullargspec(self.func)
 
     def _binded(self):
@@ -67,13 +71,22 @@ class Aldo:
         args = []
         parameters = self.parameters()
 
+        if self.debug:
+            print("Func:", self.func)
+            print("Args:", self.args)
+            print("Kwargs:", self.kwargs)
+            print("Inspect:", parameters)
+
         if self._args_not_filled_yet(parameters.args):
-            print("not filled yet")
             for key in parameters.args:
                 if not key in parameters.annotations:
                     continue
 
-                kwargs[key] = self._handle_class(parameters.annotations[key])
+                if key in self.kwargs:
+                    kwargs[key] = self.kwargs[key]
+                else:
+                    kwargs[key] = self._handle_class(parameters.annotations[key])
+
                 self.handled[key] = kwargs[key]
 
             pending = [arg for arg in parameters.args if not arg in kwargs]

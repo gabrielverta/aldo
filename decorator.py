@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from aldo.dependency_manager import Aldo
+from aldo.exceptions import AldoRedirect
 from functools import wraps
 
 
@@ -12,8 +13,11 @@ def aldo(func):
     """
     @wraps(func)
     def run(*args, **kwargs):
-        return Aldo(func, *args, **kwargs)()
-
+        try:
+            return Aldo(func, *args, **kwargs)()
+        except AldoRedirect as redirect:
+            return redirect.response
+    run._original_ = func
     return run
 
 
@@ -51,3 +55,4 @@ def remove_parameters(kwargs):
         del(kwargs['aldo_context'])
     except KeyError:
         pass
+

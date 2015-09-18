@@ -64,3 +64,9 @@ def test_with_known_positional_parameters():
     first, second = aldo()
     assert(10 == first)
     assert(20 == second)
+
+def test_with_known_named_parameters():
+    foo = Foo()
+    aldo = Aldo(with_named_parameters, foo=foo)
+    response = aldo()
+    assert(foo == response)
