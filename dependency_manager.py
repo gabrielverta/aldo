@@ -9,6 +9,7 @@ class Aldo:
         Aldo dependency manager
     """
     bindings = {}
+    before_binding = []
 
     def __init__(self, func, *args, **kwargs):
         """
@@ -27,10 +28,20 @@ class Aldo:
         """
         Aldo.bindings[klass] = factory
 
+    @staticmethod
+    def before(func):
+        """
+            What should be handled before binding
+        """
+        Aldo.before_binding.append(func)
+
     def __call__(self):
         """
             Call handled function using parameters
         """
+        for func in self.before_binding:
+            func(*self.args, **self.kwargs)
+
         try:
             return self._binded()
         except AldoClassNotBindedException:

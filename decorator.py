@@ -21,6 +21,19 @@ def aldo(func):
     return run
 
 
+def before(func):
+    """
+        Aldo dependency manager decorator
+        :param func: function or class that needs to be handled
+        :return: execute func filling parameters
+    """
+    @wraps(func)
+    def run(*args, **kwargs):
+        return func(*args, **kwargs)
+    Aldo.before(run)
+    return run
+
+
 def teach(klass, params=False):
     """
         Decorator to teach aldo how to create an instance of a class

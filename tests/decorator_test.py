@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 
 import os, sys
+import pytest
 
 sys.path.insert(0, os.path.realpath('../.'))
 
-from aldo.decorator import aldo, teach, Aldo
+from aldo.decorator import aldo, teach, before, Aldo
 from aldo.exceptions import AldoRedirect
 
 
@@ -90,8 +91,6 @@ def test_with_all_parameters_sent():
 
 
 def test_teach_decorator():
-    Aldo.bindings = {}
-
     @teach(Cache)
     def cache_factory(*args, **kwargs):
         assert(not "aldo_context" in kwargs)
@@ -103,8 +102,6 @@ def test_teach_decorator():
 
 
 def test_teaching_with_context():
-    Aldo.bindings = {}
-
     @aldo
     def my_view(foo: Foo, bar: Bar):
         return foo, bar
@@ -120,8 +117,6 @@ def test_teaching_with_context():
 
 
 def test_redirect():
-    Aldo.bindings = {}
-
     @aldo
     def my_view(foo: Foo):
         return foo
@@ -135,8 +130,6 @@ def test_redirect():
 
 
 def test_aldo_on_a_function_with_aldo():
-    Aldo.bindings = {}
-
     @aldo
     def my_view(foo: Foo):
         return foo
@@ -147,8 +140,6 @@ def test_aldo_on_a_function_with_aldo():
 
 
 def test_aldo_after_redirect():
-    Aldo.bindings = {}
-
     @aldo
     def first_view(request, foo: Foo):
         raise Exception("Flow should not enter here")
@@ -173,3 +164,36 @@ def test_aldo_after_redirect():
     response = first_view('title')
     assert(isinstance(response, str))
     assert('second view title' == response)
+
+
+def test_before_decorator():
+    class TestException(Exception):
+        pass
+
+    @aldo
+    def my_view(title):
+        return title
+
+    @before
+    def before_bind(title, *args, **kwargs):
+        if not title == "ok":
+            raise TestException("Title must be ok")
+
+    response = my_view('ok')
+    assert("ok" == response)
+
+    # invalid request can not be handled
+    with pytest.raises(TestException):
+        my_view("invalid request")
+
+
+
+def setup_function(function):
+    """ setup any state specific to the execution of the given module."""
+    Aldo.bindings = {}
+    Aldo.before_binding = []
+
+def teardown_function(function):
+    """ teardown any state specific to the execution of the given module."""
+    Aldo.bindings = {}
+    Aldo.before_binding = []
