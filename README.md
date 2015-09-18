@@ -15,6 +15,6 @@ You can also "teach" aldo how to create an instance of a class (or subclass):
         
     @aldo
     def my_view(cache: Cache):
-        return cache.get('key')
+        return cache
     >>> my_view()
     <RedisCache>
